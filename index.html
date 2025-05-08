@@ -40,7 +40,7 @@ DOCTYPE html>
 
         // 図形データ
         const defaultShapes = [
-            { type: 'rect', x: 390, y: 50, width: 100, height: 50, color: 'gray', text: '', textColor: 'white', fontSize: 50 },
+            { type: 'rect', x: 390, y: 70, width: 100, height: 50, color: 'gray', text: '本部', textColor: 'white', fontSize: 50 },
             { type: 'ellipse', x: 130, y: 400, rx: 40, ry: 80, color: 'blue', text: '2 男', textColor: 'black' },
             { type: 'ellipse', x: 230, y: 400, rx: 40, ry: 80, color: 'red', text: '2 女', textColor: 'black' },
             { type: 'ellipse', x: 320, y: 400, rx: 20, ry: 60, color: 'blue', text: '3 男', textColor: 'black' },
@@ -56,7 +56,7 @@ DOCTYPE html>
 
         // 各図形の目標位置 (Run the World 体形)
         const targets = [
-            { x: 390, y: 50 }, // 本部 (変わらない)
+            { x: 390, y: 70 }, // 本部 (変わらない)
             { x: 180, y: 360, rx: 80, ry: 40 }, // 2 男 (横長の楕円形に変更)
             { x: 180, y: 260, rx: 80, ry: 40 }, // 2 女 (横長の楕円形にして左側の3女と同じ高さに移動)
             { x: 440, y: 200, rx: 150, ry: 30, color: 'blue', text: '3 男' }, // 統合された3 男
