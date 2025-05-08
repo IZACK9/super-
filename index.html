@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +9,7 @@
             border: 1px solid black;
             display: block;
             margin: 0 auto;
-            width: 100%;
+            max-width: 100%;
             height: auto;
         }
 
@@ -38,18 +37,31 @@
         const ctx = canvas.getContext('2d');
         const titleElement = document.getElementById('title');
 
+        // リサイズ処理：画面幅に合わせてcanvasサイズ調整
+        function resizeCanvas() {
+            const containerWidth = document.body.clientWidth;
+            const aspectRatio = 800 / 600;
+            canvas.width = containerWidth;
+            canvas.height = containerWidth / aspectRatio;
+            drawShapes(); // 再描画
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // 初期実行
+
         const defaultShapes = [
             { type: 'rect', x: 390, y: 50, width: 100, height: 50, color: 'gray', text: '本部', textColor: 'white' },
             { type: 'ellipse', x: 130, y: 400, rx: 40, ry: 80, color: 'blue', text: '2 男', textColor: 'black' },
             { type: 'ellipse', x: 230, y: 400, rx: 40, ry: 80, color: 'red', text: '2 女', textColor: 'black' },
             { type: 'ellipse', x: 320, y: 400, rx: 20, ry: 60, color: 'blue', text: '3 男', textColor: 'black' },
             { type: 'ellipse', x: 580, y: 400, rx: 20, ry: 60, color: 'blue', text: '3 男', textColor: 'black' },
-            { type: 'ellipse', x: 370, y: 400, rx: 20, ry: 60, color: 'red', text: '3 女', angle: 0, textColor: 'black' },
-            { type: 'ellipse', x: 530, y: 400, rx: 20, ry: 60, color: 'red', text: '3 女', angle: 0, textColor: 'black' },
+            { type: 'ellipse', x: 370, y: 400, rx: 20, ry: 60, color: 'red', text: '3 女', angle: 0,textColor: 'black' },
+            { type: 'ellipse', x: 530, y: 400, rx: 20, ry: 60, color: 'red', text: '3 女', angle: 0,textColor: 'black' },
             { type: 'circle', x: 450, y: 400, radius: 60, color: 'yellow', text: '応援', textColor: 'black' },
             { type: 'ellipse', x: 650, y: 400, rx: 40, ry: 80, color: 'blue', text: '1 男', textColor: 'black' },
             { type: 'ellipse', x: 750, y: 400, rx: 40, ry: 80, color: 'red', text: '1 女', textColor: 'black' },
         ];
+
+        let shapes = JSON.parse(JSON.stringify(defaultShapes));
 
         const targets = [
             { x: 390, y: 50 },
@@ -64,15 +76,8 @@
             { x: 700, y: 260, rx: 80, ry: 40 },
         ];
 
-        let shapes = JSON.parse(JSON.stringify(defaultShapes));
-
         function drawShapes() {
-            // スケールをcanvas表示サイズに合わせる
-            const scaleX = canvas.clientWidth / 800;
-            const scaleY = canvas.clientHeight / 600;
-            ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0); // スケーリング設定
-            ctx.clearRect(0, 0, 800, 600);
-
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             shapes.forEach((shape) => {
                 if (!shape) return;
                 ctx.save();
@@ -100,9 +105,7 @@
                     ctx.font = '20px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    const textX = shape.x + (shape.type === 'rect' ? shape.width / 2 : 0);
-                    const textY = shape.y + (shape.type === 'rect' ? shape.height / 2 : 0);
-                    ctx.fillText(shape.text, textX, textY);
+                    ctx.fillText(shape.text, shape.x + (shape.type === 'rect' ? shape.width / 2 : 0), shape.y + (shape.type === 'rect' ? shape.height / 2 : 0));
                 }
                 ctx.restore();
             });
@@ -163,7 +166,6 @@
         }
 
         drawShapes();
-        window.addEventListener('resize', drawShapes);
     </script>
 </body>
 </html>
