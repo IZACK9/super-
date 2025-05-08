@@ -9,6 +9,8 @@
             border: 1px solid black;
             display: block;
             margin: 0 auto;
+            max-width: 100%;
+            height: auto;
         }
 
         .controls {
@@ -35,7 +37,17 @@
         const ctx = canvas.getContext('2d');
         const titleElement = document.getElementById('title');
 
-        // 初期の図形データ
+        // リサイズ処理：画面幅に合わせてcanvasサイズ調整
+        function resizeCanvas() {
+            const containerWidth = document.body.clientWidth;
+            const aspectRatio = 800 / 600;
+            canvas.width = containerWidth;
+            canvas.height = containerWidth / aspectRatio;
+            drawShapes(); // 再描画
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas(); // 初期実行
+
         const defaultShapes = [
             { type: 'rect', x: 390, y: 50, width: 100, height: 50, color: 'gray', text: '本部', textColor: 'white' },
             { type: 'ellipse', x: 130, y: 400, rx: 40, ry: 80, color: 'blue', text: '2 男', textColor: 'black' },
@@ -49,33 +61,31 @@
             { type: 'ellipse', x: 750, y: 400, rx: 40, ry: 80, color: 'red', text: '1 女', textColor: 'black' },
         ];
 
-        let shapes = JSON.parse(JSON.stringify(defaultShapes)); // 現在の図形データを初期状態からコピー
+        let shapes = JSON.parse(JSON.stringify(defaultShapes));
 
-        // 各図形の目標位置 (Run the World 体形)
         const targets = [
-            { x: 390, y: 50 }, // 本部 (変わらない)
-            { x: 180, y: 360, rx: 80, ry: 40 }, // 2 男 (横長の楕円形に変更)
-            { x: 180, y: 260, rx: 80, ry: 40 }, // 2 女 (横長の楕円形にして左側の3女と同じ高さに移動)
-            { x: 440, y: 200, rx: 150, ry: 30, color: 'blue', text: '3 男' }, // 統合された3 男
+            { x: 390, y: 50 },
+            { x: 180, y: 360, rx: 80, ry: 40 },
+            { x: 180, y: 260, rx: 80, ry: 40 },
             { x: 440, y: 200, rx: 150, ry: 30, color: 'blue', text: '3 男' },
-            { x: 330, y: 280, angle: 30 }, // 左側の3 女 (ハの字で配置、3 男の下)
-            { x: 550, y: 280, angle: -30 }, // 右側の3 女 (ハの字で配置、3 男の下)
-            { x: 450, y: 400 }, // 応援 (変わらない)
-            { x: 700, y: 360, rx: 80, ry: 40 }, // 1 男 (横長の楕円形に変更)
-            { x: 700, y: 260, rx: 80, ry: 40 }, // 1 女 (横長の楕円形にして右側の3女と同じ高さに移動)
+            { x: 440, y: 200, rx: 150, ry: 30, color: 'blue', text: '3 男' },
+            { x: 330, y: 280, angle: 30 },
+            { x: 550, y: 280, angle: -30 },
+            { x: 450, y: 400 },
+            { x: 700, y: 360, rx: 80, ry: 40 },
+            { x: 700, y: 260, rx: 80, ry: 40 },
         ];
 
-        // 描画関数
         function drawShapes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // キャンバスをクリア
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             shapes.forEach((shape) => {
-                if (!shape) return; // null の図形をスキップ
+                if (!shape) return;
                 ctx.save();
                 ctx.beginPath();
                 if (shape.type === 'ellipse') {
                     if (shape.angle) {
                         ctx.translate(shape.x, shape.y);
-                        ctx.rotate((shape.angle * Math.PI) / 180); // 回転
+                        ctx.rotate((shape.angle * Math.PI) / 180);
                         ctx.ellipse(0, 0, shape.rx || 40, shape.ry || 80, 0, 0, 2 * Math.PI);
                         ctx.translate(-shape.x, -shape.y);
                     } else {
@@ -90,9 +100,8 @@
                 ctx.fill();
                 ctx.closePath();
 
-                // テキストを描画
                 if (shape.text) {
-                    ctx.fillStyle = shape.textColor || 'black'; // テキストカラーを指定
+                    ctx.fillStyle = shape.textColor || 'black';
                     ctx.font = '20px Arial';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
@@ -102,12 +111,11 @@
             });
         }
 
-        // アニメーション
         function animate(targets) {
             let isComplete = true;
             shapes.forEach((shape, index) => {
                 const target = targets[index];
-                if (!target || !shape) return; // null の図形をスキップ
+                if (!target || !shape) return;
                 const dx = (target.x - shape.x) * 0.1;
                 const dy = (target.y - shape.y) * 0.1;
 
@@ -117,7 +125,6 @@
                     isComplete = false;
                 }
 
-                // サイズ変更
                 if (target.rx && target.ry) {
                     const drx = (target.rx - (shape.rx || 40)) * 0.1;
                     const dry = (target.ry - (shape.ry || 80)) * 0.1;
@@ -129,7 +136,6 @@
                     }
                 }
 
-                // 回転
                 if (target.angle !== undefined) {
                     const currentAngle = shape.angle || 0;
                     const dAngle = (target.angle - currentAngle) * 0.1;
@@ -150,16 +156,16 @@
         }
 
         function moveToTarget() {
-            titleElement.textContent = '2 Run the World'; // タイトルを変更
+            titleElement.textContent = '2 Run the World';
             animate(targets);
         }
 
         function resetToDefault() {
-            titleElement.textContent = '１ペアダンス'; // タイトルを初期状態に戻す
-            animate(defaultShapes); // 滑らかに初期位置へ戻る
+            titleElement.textContent = '１ペアダンス';
+            animate(defaultShapes);
         }
 
-        drawShapes(); // 初期描画
+        drawShapes();
     </script>
 </body>
 </html>
